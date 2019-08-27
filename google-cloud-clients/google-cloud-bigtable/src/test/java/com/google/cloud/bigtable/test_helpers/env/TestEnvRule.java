@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.cloud.bigtable.data.v2.it.env;
+package com.google.cloud.bigtable.test_helpers.env;
+
+import static com.google.common.truth.TruthJUnit.assume;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,19 +39,26 @@ import org.junit.rules.ExternalResource;
  * <p>By default, {@code emulator} will be used
  */
 public class TestEnvRule extends ExternalResource {
-  private static final Logger LOGGER = Logger.getLogger(TestEnvRule.class.getName());
 
+  private static final Logger LOGGER = Logger.getLogger(TestEnvRule.class.getName());
+  private static final String BIGTABLE_EMULATOR_HOST_ENV_VAR = "BIGTABLE_EMULATOR_HOST";
   private static final String ENV_PROPERTY = "bigtable.env";
 
-  private TestEnv testEnv;
+  private AbstractTestEnv testEnv;
 
   @Override
   protected void before() throws Throwable {
+    assume()
+        .withMessage(
+            "Integration tests can't run with the BIGTABLE_EMULATOR_HOST environment variable set"
+                + ". Please use the emulator-it maven profile instead")
+        .that(System.getenv())
+        .doesNotContainKey(BIGTABLE_EMULATOR_HOST_ENV_VAR);
     String env = System.getProperty(ENV_PROPERTY, "emulator");
 
     switch (env) {
       case "emulator":
-        testEnv = new EmulatorEnv();
+        testEnv = EmulatorEnv.createBundled();
         break;
       case "prod":
         testEnv = ProdEnv.fromSystemProperties();
@@ -69,6 +78,12 @@ public class TestEnvRule extends ExternalResource {
   @Override
   protected void after() {
     try {
+      env().cleanUpStale();
+    } catch (Exception e) {
+      LOGGER.log(Level.WARNING, "Failed to cleanup environment", e);
+    }
+
+    try {
       testEnv.stop();
     } catch (Exception e) {
       LOGGER.log(Level.WARNING, "Failed to stop the environment", e);
@@ -76,7 +91,7 @@ public class TestEnvRule extends ExternalResource {
     testEnv = null;
   }
 
-  public TestEnv env() {
+  public AbstractTestEnv env() {
     return testEnv;
   }
 }

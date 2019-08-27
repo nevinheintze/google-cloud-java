@@ -3,9 +3,6 @@
 JDBC Driver for
 [Google Cloud Spanner](https://cloud.google.com/spanner/).
 
-> Note: This client is a work-in-progress, and may occasionally
-> make backwards-incompatible changes.
-
 ## Quickstart
 
 [//]: # ({x-version-update-start:google-cloud-spanner-jdbc:released})
@@ -14,16 +11,16 @@ If you are using Maven, add this to your pom.xml file
 <dependency>
   <groupId>com.google.cloud</groupId>
   <artifactId>google-cloud-spanner-jdbc</artifactId>
-  <version>0.1.0</version>
+  <version>0.3.0</version>
 </dependency>
 ```
 If you are using Gradle, add this to your dependencies
 ```Groovy
-compile 'com.google.cloud:google-cloud-spanner-jdbc:0.1.0'
+compile 'com.google.cloud:google-cloud-spanner-jdbc:0.3.0'
 ```
 If you are using SBT, add this to your dependencies
 ```Scala
-libraryDependencies += "com.google.cloud" % "google-cloud-spanner-jdbc" % "0.1.0"
+libraryDependencies += "com.google.cloud" % "google-cloud-spanner-jdbc" % "0.3.0"
 ```
 [//]: # ({x-version-update-end})
 

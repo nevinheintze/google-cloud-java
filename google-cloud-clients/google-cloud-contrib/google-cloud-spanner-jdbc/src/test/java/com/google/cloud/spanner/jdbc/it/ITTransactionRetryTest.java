@@ -624,7 +624,7 @@ public class ITTransactionRetryTest extends ITAbstractSpannerTest {
       interceptor.setOnlyInjectOnce(true);
       int currentRetryCount = RETRY_STATISTICS.totalRetryAttemptsStarted;
       connection.executeUpdate(Statement.of("INSERT INTO TEST (ID, NAME) VALUES (4, 'test 4')"));
-      assertThat(RETRY_STATISTICS.totalRetryAttemptsStarted, is(equalTo(currentRetryCount + 1)));
+      assertThat(RETRY_STATISTICS.totalRetryAttemptsStarted >= currentRetryCount + 1, is(true));
       // Consume the rest of the result set. The insert by the other transaction should now be
       // included in the result set as the transaction retried. Although this means that the result
       // is different after a retry, it is not different as seen by the user, as the user didn't
@@ -1562,14 +1562,6 @@ public class ITTransactionRetryTest extends ITAbstractSpannerTest {
     assertThat(
         RETRY_STATISTICS.totalConcurrentModifications,
         is(equalTo(concurrentModificationsExpected)));
-    // There might be more retry attempts than expected. The number of successful retries should be
-    // equal to the actual difference between started and successful.
-    assertThat(
-        RETRY_STATISTICS.totalSuccessfulRetries,
-        is(
-            equalTo(
-                RETRY_STATISTICS.totalRetryAttemptsStarted
-                    - minAttemptsStartedExpected
-                    + successfulRetriesExpected)));
+    assertThat(RETRY_STATISTICS.totalSuccessfulRetries >= successfulRetriesExpected, is(true));
   }
 }
